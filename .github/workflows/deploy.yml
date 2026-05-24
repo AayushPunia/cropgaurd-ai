@@ -52,11 +52,12 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "k8s/deployment.yaml"
           target: "~/"
-
       - name: Apply Kubernetes Configurations
         uses: appleboy/ssh-action@v1
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         with:
-          host: $ 52.66.32.232
+          host: 52.66.32.232
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           envs: REGISTRY
@@ -65,3 +66,4 @@ jobs:
             aws ecr get-login-password --region ap-south-1 | kubectl create secret docker-registry ecr-secret --docker-server=$REGISTRY --docker-username=AWS --docker-password-stdin --dry-run=client -o yaml | kubectl apply -f -
             kubectl apply -f ~/k8s/deployment.yaml
             kubectl rollout status deployment/cropguard-ai
+      
