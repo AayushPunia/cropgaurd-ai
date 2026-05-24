@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cropguard-ai
+  labels:
+    app: cropguard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cropguard
+  template:
+    metadata:
+      labels:
+        app: cropguard
+    spec:
+      imagePullSecrets:
+        - name: ecr-secret
+      containers:
+      - name: cropguard-api
+        image: IMAGE_PLACEHOLDER
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            memory: "2Gi"
+          limits:
+            memory: "6Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cropguard-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+  selector:
+    app: cropguard
