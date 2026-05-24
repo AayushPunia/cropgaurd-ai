@@ -55,10 +55,8 @@ jobs:
 
       - name: Apply Kubernetes Configurations
         uses: appleboy/ssh-action@v1
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         with:
-          host: ${{ secrets.EC2_HOST }}
+          host: $ 52.66.32.232
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           envs: REGISTRY
