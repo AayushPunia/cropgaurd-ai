@@ -893,6 +893,7 @@
       position: relative;
       display: inline-block;
     }
+
     .nav-dropdown {
       display: none;
       position: absolute;
@@ -903,21 +904,26 @@
       background: rgba(20, 30, 20, 0.92);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 14px;
       padding: 8px 0;
       z-index: 1000;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
     }
-    .nav-dropdown.open { display: block; }
+
+    .nav-dropdown.open {
+      display: block;
+    }
+
     .nav-dropdown a {
       display: block;
       padding: 10px 20px;
-      color: rgba(255,255,255,0.85);
+      color: rgba(255, 255, 255, 0.85);
       text-decoration: none;
       font-size: 0.88rem;
       transition: background 0.2s, color 0.2s;
     }
+
     .nav-dropdown a:hover {
       background: rgba(74, 222, 128, 0.12);
       color: #4ade80;
@@ -928,57 +934,70 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
       z-index: 9999;
       align-items: center;
       justify-content: center;
     }
-    .about-overlay.open { display: flex; }
+
+    .about-overlay.open {
+      display: flex;
+    }
+
     .about-modal {
       background: rgba(20, 30, 20, 0.95);
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 20px;
       padding: 40px;
       max-width: 560px;
       width: 90%;
       position: relative;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
     }
+
     .about-modal h2 {
       font-size: 1.6rem;
       margin-bottom: 12px;
       color: #4ade80;
     }
+
     .about-modal p {
       font-size: 0.95rem;
       line-height: 1.7;
-      color: rgba(255,255,255,0.8);
+      color: rgba(255, 255, 255, 0.8);
       margin-bottom: 12px;
     }
+
     .about-modal .close-btn {
       position: absolute;
       top: 16px;
       right: 20px;
       background: none;
       border: none;
-      color: rgba(255,255,255,0.6);
+      color: rgba(255, 255, 255, 0.6);
       font-size: 1.5rem;
       cursor: pointer;
       transition: color 0.2s;
     }
-    .about-modal .close-btn:hover { color: #fff; }
+
+    .about-modal .close-btn:hover {
+      color: #fff;
+    }
+
     .about-modal ul {
       list-style: none;
       padding: 0;
       margin: 12px 0;
     }
+
     .about-modal ul li {
       padding: 4px 0;
-      color: rgba(255,255,255,0.75);
+      color: rgba(255, 255, 255, 0.75);
       font-size: 0.9rem;
     }
+
     .about-modal ul li::before {
       content: '🌱 ';
     }
@@ -1013,7 +1032,8 @@
       </a>
 
       <div class="nav-pill liquid-glass">
-        <button class="active" onclick="document.getElementById('upload-section').scrollIntoView({behavior:'smooth'})">Detect</button>
+        <button class="active"
+          onclick="document.getElementById('upload-section').scrollIntoView({behavior:'smooth'})">Detect</button>
         <div class="nav-dropdown-wrap">
           <button onclick="toggleDropdown('crops-dropdown')">
             Crops
@@ -1057,7 +1077,8 @@
       </div>
 
       <div class="nav-ctas">
-        <button class="btn-ghost" onclick="window.open('https://github.com/AayushPunia/cropgaurd-ai','_blank')">GitHub</button>
+        <button class="btn-ghost"
+          onclick="window.open('https://github.com/AayushPunia/cropgaurd-ai','_blank')">GitHub</button>
         <button class="btn-white"
           onclick="document.getElementById('upload-section').scrollIntoView({behavior:'smooth'})">Scan a Leaf</button>
       </div>
@@ -1073,12 +1094,16 @@
 
     <!-- Mobile menu -->
     <div class="mobile-menu liquid-glass" id="mobile-menu">
-      <button onclick="document.getElementById('upload-section').scrollIntoView({behavior:'smooth'});toggleMenu()">Detect</button>
-      <button onclick="document.getElementById('upload-section').scrollIntoView({behavior:'smooth'});toggleMenu()">Crops</button>
-      <button onclick="document.getElementById('upload-section').scrollIntoView({behavior:'smooth'});toggleMenu()">Diseases</button>
+      <button
+        onclick="document.getElementById('upload-section').scrollIntoView({behavior:'smooth'});toggleMenu()">Detect</button>
+      <button
+        onclick="document.getElementById('upload-section').scrollIntoView({behavior:'smooth'});toggleMenu()">Crops</button>
+      <button
+        onclick="document.getElementById('upload-section').scrollIntoView({behavior:'smooth'});toggleMenu()">Diseases</button>
       <button onclick="openAbout();toggleMenu()">About</button>
       <div class="mobile-ctas">
-        <button class="btn-reset" style="flex:1;border-radius:99px" onclick="window.open('https://github.com/AayushPunia/cropgaurd-ai','_blank');toggleMenu()">GitHub</button>
+        <button class="btn-reset" style="flex:1;border-radius:99px"
+          onclick="window.open('https://github.com/AayushPunia/cropgaurd-ai','_blank');toggleMenu()">GitHub</button>
         <button class="btn-analyze" style="flex:1"
           onclick="document.getElementById('upload-section').scrollIntoView({behavior:'smooth'});toggleMenu()">Scan a
           Leaf</button>
@@ -1229,7 +1254,8 @@
     <div class="about-modal">
       <button class="close-btn" onclick="closeAbout()">&times;</button>
       <h2>About CropGuard AI</h2>
-      <p>CropGuard AI is a free, open-source crop disease detection tool built to help Indian farmers protect their harvests. Simply upload a photo of a crop leaf and get instant AI-powered diagnosis.</p>
+      <p>CropGuard AI is a free, open-source crop disease detection tool built to help Indian farmers protect their
+        harvests. Simply upload a photo of a crop leaf and get instant AI-powered diagnosis.</p>
       <ul>
         <li>Powered by MobileNetV2 deep learning model</li>
         <li>Trained on 54,000+ PlantVillage images</li>
@@ -1237,7 +1263,9 @@
         <li>~96% classification accuracy</li>
         <li>Instant results — no sign-up needed</li>
       </ul>
-      <p style="font-size:0.85rem;color:rgba(255,255,255,0.5);margin-top:16px">Built with ❤ for Indian farmers · Open source on <a href="https://github.com/AayushPunia/cropgaurd-ai" target="_blank" style="color:#4ade80;text-decoration:underline">GitHub</a></p>
+      <p style="font-size:0.85rem;color:rgba(255,255,255,0.5);margin-top:16px">Built with ❤ for Indian farmers · Open
+        source on <a href="https://github.com/AayushPunia/cropgaurd-ai" target="_blank"
+          style="color:#4ade80;text-decoration:underline">GitHub</a></p>
     </div>
   </div>
 
@@ -1281,7 +1309,7 @@
     function closeDropdowns() {
       document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
     }
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
       if (!e.target.closest('.nav-dropdown-wrap')) closeDropdowns();
     });
 
