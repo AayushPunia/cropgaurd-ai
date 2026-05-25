@@ -105,18 +105,32 @@ pipeline {
 
         // ====================================================
         // Stage 5: Health Check
+        // FIX: Service is ClusterIP so localhost won't work.
+        // Instead we exec curl INSIDE the running pod itself.
         // ====================================================
         stage('Health Check') {
             steps {
                 script {
                     echo "🏥 Running health check..."
 
-                    // Wait for service to be ready
+                    // Wait for pod to be fully ready
                     sleep(time: 15, unit: 'SECONDS')
 
-                    // Check health endpoint
+                    // Get the name of a running pod
+                    def podName = sh(
+                        script: "kubectl get pod -l app=cropguard-ai --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}' 2>/dev/null",
+                        returnStdout: true
+                    ).trim()
+
+                    if (!podName) {
+                        error("❌ No running pod found for cropguard-ai. Check: kubectl get pods")
+                    }
+
+                    echo "🔍 Checking health on pod: ${podName}"
+
+                    // Run curl inside the pod (bypasses ClusterIP restriction)
                     def response = sh(
-                        script: "curl -sf http://localhost/health || curl -sf http://localhost:8000/health",
+                        script: "kubectl exec ${podName} -- curl -sf http://localhost:8000/health",
                         returnStdout: true
                     ).trim()
 
@@ -125,7 +139,7 @@ pipeline {
                     if (response.contains('"status":"ok"') || response.contains('"status": "ok"')) {
                         echo "✅ Health check PASSED!"
                     } else {
-                        echo "⚠️ Health check returned unexpected response, but deployment succeeded"
+                        echo "⚠️ Pod is running but health response was unexpected: ${response}"
                     }
                 }
             }
@@ -155,7 +169,8 @@ pipeline {
             Common fixes:
             - ECR login failed? Check IAM role is attached to EC2.
             - Docker build failed? Check Dockerfile and requirements.
-            - K3s deploy failed? Run: kubectl describe pods -l app=cropguard
+            - K3s deploy failed? Run: kubectl describe pods -l app=cropguard-ai
+            - Health check failed? Run: kubectl get pods
             ========================================
             """
         }
