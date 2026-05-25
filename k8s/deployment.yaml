@@ -1,3 +1,8 @@
+# ============================================================
+# CropGuard AI — Kubernetes Deployment + Service
+# Runs on K3s (single-node Kubernetes on EC2)
+# ============================================================
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,19 +19,48 @@ spec:
       labels:
         app: cropguard
     spec:
-      imagePullSecrets:
-        - name: ecr-secret
+      # No imagePullSecrets needed — ECR auth is handled by
+      # K3s registries.yaml (refreshed by cron every 6 hours)
       containers:
       - name: cropguard-api
         image: IMAGE_PLACEHOLDER
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
+
+        # Health checks — K3s uses these to manage traffic & restarts
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+        # Resource limits — PyTorch model needs significant memory
         resources:
           requests:
             memory: "2Gi"
+            cpu: "500m"
           limits:
             memory: "6Gi"
+            cpu: "2000m"
+
 ---
+# ============================================================
+# Service — Exposes the app on port 80 via K3s LoadBalancer
+# ============================================================
+
 apiVersion: v1
 kind: Service
 metadata:

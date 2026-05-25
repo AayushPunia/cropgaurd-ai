@@ -1,0 +1,30 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ML Model cache
+app/model/*.pt
+app/model/*.bin
+
+# Terraform (see terraform/.gitignore for more)
+terraform/.terraform/
+terraform/*.tfstate*
