@@ -41,7 +41,6 @@ pipeline {
 
         // ====================================================
         // Stage 3: Push to Amazon ECR
-        // Uses IAM Instance Role — no hardcoded credentials!
         // ====================================================
         stage('Push to ECR') {
             steps {
@@ -66,15 +65,13 @@ pipeline {
         }
 
         // ====================================================
-        // Stage 4: Deploy to K3s (Kubernetes)
-        // Jenkins and K3s are on the same machine — no SSH needed!
+        // Stage 4: Deploy to K3s
         // ====================================================
         stage('Deploy to K3s') {
             steps {
                 script {
                     echo "🚀 Deploying to Kubernetes..."
 
-                    // Check if deployment exists; if not, apply the manifest
                     def deployExists = sh(
                         script: "kubectl get deployment cropguard-ai --no-headers 2>/dev/null | wc -l",
                         returnStdout: true
@@ -94,7 +91,6 @@ pipeline {
                         """
                     }
 
-                    // Wait for rollout to complete (timeout 5 minutes)
                     echo "⏳ Waiting for rollout..."
                     sh "kubectl rollout status deployment/cropguard-ai --timeout=300s"
 
@@ -105,30 +101,38 @@ pipeline {
 
         // ====================================================
         // Stage 5: Health Check
-        // FIX: Service is ClusterIP so localhost won't work.
-        // Instead we exec curl INSIDE the running pod itself.
+        // FIX: Use simple pod name lookup (no --field-selector)
+        //      then exec curl inside the pod directly.
         // ====================================================
         stage('Health Check') {
             steps {
                 script {
                     echo "🏥 Running health check..."
-
-                    // Wait for pod to be fully ready
                     sleep(time: 15, unit: 'SECONDS')
 
-                    // Get the name of a running pod
+                    // Simple pod name fetch — no field-selector (unreliable)
                     def podName = sh(
-                        script: "kubectl get pod -l app=cropguard-ai --field-selector=status.phase=Running -o jsonpath='{.items[0].metadata.name}' 2>/dev/null",
+                        script: """
+                            kubectl get pod -l app=cropguard-ai \
+                                -o jsonpath='{.items[0].metadata.name}' 2>/dev/null
+                        """,
                         returnStdout: true
                     ).trim()
 
                     if (!podName) {
-                        error("❌ No running pod found for cropguard-ai. Check: kubectl get pods")
+                        error("❌ No pod found for cropguard-ai. Run: kubectl get pods")
                     }
 
-                    echo "🔍 Checking health on pod: ${podName}"
+                    echo "🔍 Using pod: ${podName}"
 
-                    // Run curl inside the pod (bypasses ClusterIP restriction)
+                    // Wait until the pod is actually Ready (up to 60s)
+                    sh """
+                        kubectl wait pod/${podName} \
+                            --for=condition=Ready \
+                            --timeout=60s
+                    """
+
+                    // Run curl INSIDE the pod (bypasses ClusterIP networking)
                     def response = sh(
                         script: "kubectl exec ${podName} -- curl -sf http://localhost:8000/health",
                         returnStdout: true
@@ -166,16 +170,14 @@ pipeline {
             ❌ Deployment FAILED — Build #${BUILD_NUMBER}
             ========================================
             Check the console output above for errors.
-            Common fixes:
-            - ECR login failed? Check IAM role is attached to EC2.
-            - Docker build failed? Check Dockerfile and requirements.
-            - K3s deploy failed? Run: kubectl describe pods -l app=cropguard-ai
-            - Health check failed? Run: kubectl get pods
+            Diagnose with these commands on EC2:
+              kubectl get pods
+              kubectl describe pod -l app=cropguard-ai
+              kubectl logs -l app=cropguard-ai --tail=50
             ========================================
             """
         }
         always {
-            // Clean up old Docker images to save disk space
             sh "docker image prune -f --filter 'until=24h' || true"
         }
     }
